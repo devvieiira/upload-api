@@ -27,40 +27,27 @@ export async function createTranscriptionRoute(app: FastifyInstance) {
 
 			const videoPath = video.path;
 			const audioReadStream = createReadStream(videoPath);
-			openai.get("/models").then((res) => {
-				console.log("Modelos:", res);
-			});
 
 			console.log("Conectando ao OpenAI...");
-			try {
-				const response = await openai.audio.transcriptions.create(
-					{
-						model: "whisper-1",
-						file: audioReadStream,
-						language: "pt",
-						response_format: "json",
-						temperature: 0,
-						prompt,
+			const response = await openai.audio.transcriptions.create(
+				{
+					model: "whisper-1",
+					file: audioReadStream,
+					language: "pt",
+					response_format: "json",
+					temperature: 0,
+					prompt,
+				},
+				{
+					headers: {
+						"Content-Type": "multipart/form-data",
+						Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
 					},
-					{
-						maxRetries: 2,
-						headers: {
-							"Content-Type": "multipart/form-data",
-							Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-						},
-					},
-				);
-				console.log("Resposta do OpenAI:", response);
-			} catch (error) {
-				console.error("Erro ao conectar com OpenAI:", error);
-				if (error.cause) {
-					console.error("Detalhes do erro:", error.cause);
-				}
-				throw error;
-			}
-			console.log("Resposta do OpenAI:");
+				},
+			);
+			console.log("Resposta do OpenAI:", response);
 
-			// const transcription = response.text;
+			const transcription = response.text;
 
 			console.log("Atualizando banco de dados...");
 			await prisma.video.update({
@@ -68,13 +55,13 @@ export async function createTranscriptionRoute(app: FastifyInstance) {
 					id: videoId,
 				},
 				data: {
-					// transcription,
+					transcription,
 				},
 			});
 			console.log("Banco de dados atualizado com sucesso!");
 
 			return {
-				// transcription,
+				transcription,
 			};
 		} catch (error) {
 			console.error("Erro:", error);
