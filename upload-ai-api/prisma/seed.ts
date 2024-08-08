@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
@@ -6,7 +6,7 @@ async function main() {
 
   await prisma.prompt.create({
     data: {
-      title: "Título YouTube",
+      title: 'Título YouTube',
       template: `Seu papel é gerar três títulos para um vídeo do YouTube.
 
 Abaixo você receberá uma transcrição desse vídeo, use essa transcrição para gerar os títulos.
@@ -25,15 +25,14 @@ Retorne APENAS os três títulos em formato de lista como no exemplo abaixo:
 Transcrição:
 '''
 {transcription}
-'''`.trim(),
-    },
+'''`.trim()
+    }
   })
 
   await prisma.prompt.create({
     data: {
-      title: "Descrição YouTube",
-      template:
-        `Seu papel é gerar uma descrição sucinta para um vídeo do YouTube.
+      title: 'Descrição YouTube',
+      template: `Seu papel é gerar uma descrição sucinta para um vídeo do YouTube.
   
 Abaixo você receberá uma transcrição desse vídeo, use essa transcrição para gerar a descrição.
 
@@ -53,34 +52,8 @@ Descrição.
 Transcrição:
 '''
 {transcription}
-'''`.trim(),
-    },
-  })
-
-  await prisma.prompt.create({
-    data: {
-      title: "Resumo YouTube",
-      template:
-        `Seu papel é gerar um resumo sucinto para um vídeo do YouTube.
-  
-Abaixo você receberá uma transcrição desse vídeo, use essa transcrição para gerar o resumo.
-
-A resumo deve ser escrito em primeira pessoa e deve ter o tom de uma analista sênior ensinado analista juniores, contendo os pontos principais do vídeo.
-
-Além disso, no final do resumo inclua uma conclusão do que você achou sobre o vídeo.
-
-O retorno deve seguir o seguinte formato:
-'''
-Resumo.
-
-Conclusão.
-'''
-
-Transcrição:
-'''
-{transcription}
-'''`.trim(),
-    },
+'''`.trim()
+    }
   })
 }
 

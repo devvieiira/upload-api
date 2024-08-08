@@ -1,52 +1,84 @@
-import { FastifyInstance } from "fastify"
-import { createReadStream } from 'node:fs'
-import { prisma } from '../lib/prisma'
-import { z } from 'zod'
-import { openai } from "../lib/openai"
+import type { FastifyInstance } from "fastify";
+import { createReadStream } from "node:fs";
+import { z } from "zod";
+import { prisma } from "../lib/prisma";
+import { openai } from "../lib/openai";
 
 export async function createTranscriptionRoute(app: FastifyInstance) {
-    app.post('/videos/:videoId/transcription', async (req) => {
-        const paramsSchema = z.object({
-            videoId: z.string().uuid(),
-        })
-        const { videoId } = paramsSchema.parse(req.params)
+	app.post("/videos/:videoId/transcription", async (req) => {
+		try {
+			const paramsSchema = z.object({
+				videoId: z.string().uuid(),
+			});
 
-        const bodySchema = z.object({
-            prompt: z.string(),
-        })
+			const { videoId } = paramsSchema.parse(req.params);
 
-        const { prompt } = bodySchema.parse(req.body)
+			const bodySchema = z.object({
+				prompt: z.string(),
+			});
 
-        const video = await prisma.video.findUniqueOrThrow({
-            where: {
-                id: videoId,
-            }
-        })
+			const { prompt } = bodySchema.parse(req.body);
 
-        const videoPath = video.path
-        const audioReadStream = createReadStream(videoPath)
+			const video = await prisma.video.findUniqueOrThrow({
+				where: {
+					id: videoId,
+				},
+			});
 
-        const response = await openai.audio.transcriptions.create({
-            file: audioReadStream,
-            model: 'whisper-1',
-            language: 'pt',
-            response_format: 'json',
-            temperature: 0,
-            prompt,
-        })
+			const videoPath = video.path;
+			const audioReadStream = createReadStream(videoPath);
+			openai.get("/models").then((res) => {
+				console.log("Modelos:", res);
+			});
 
-        const transcription = response.text
+			console.log("Conectando ao OpenAI...");
+			try {
+				const response = await openai.audio.transcriptions.create(
+					{
+						model: "whisper-1",
+						file: audioReadStream,
+						language: "pt",
+						response_format: "json",
+						temperature: 0,
+						prompt,
+					},
+					{
+						maxRetries: 2,
+						headers: {
+							"Content-Type": "multipart/form-data",
+							Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+						},
+					},
+				);
+				console.log("Resposta do OpenAI:", response);
+			} catch (error) {
+				console.error("Erro ao conectar com OpenAI:", error);
+				if (error.cause) {
+					console.error("Detalhes do erro:", error.cause);
+				}
+				throw error;
+			}
+			console.log("Resposta do OpenAI:");
 
-        await prisma.video.update({
-            where: {
-                id: videoId,
-            },
-            data: {
-                transcription,
-            }
-        })
+			// const transcription = response.text;
 
-        return {transcription}
+			console.log("Atualizando banco de dados...");
+			await prisma.video.update({
+				where: {
+					id: videoId,
+				},
+				data: {
+					// transcription,
+				},
+			});
+			console.log("Banco de dados atualizado com sucesso!");
 
-    })   
+			return {
+				// transcription,
+			};
+		} catch (error) {
+			console.error("Erro:", error);
+			throw error;
+		}
+	});
 }
