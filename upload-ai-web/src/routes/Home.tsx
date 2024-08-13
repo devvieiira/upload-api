@@ -1,7 +1,7 @@
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
-import { Button } from "./components/ui/button";
+import { Button } from "../components/ui/button";
 
-export function App() {
+export function Home() {
 	const logoIcon = new URL("./img/logo.svg", import.meta.url).href;
 	const discordIcon = new URL("./img/discord-icon.svg", import.meta.url).href;
 	const redditIcon = new URL("./img/reddit-icon.svg", import.meta.url).href;

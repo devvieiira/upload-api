@@ -25,7 +25,7 @@ OPENAI_API_KEY="SUA_CHAVE_AQUI"
 
  Já no frontend você também precisa criar uma **.env** identificando a rota do seu backend:
 
- ```
+ ```  
  FRONTEND_URL="http://localhost:4000"
  ```
 
