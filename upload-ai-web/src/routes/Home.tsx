@@ -1,11 +1,13 @@
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { Button } from "../components/ui/button";
 
+import { Link } from "react-router-dom";
+
 export function Home() {
-	const logoIcon = new URL("./img/logo.svg", import.meta.url).href;
-	const discordIcon = new URL("./img/discord-icon.svg", import.meta.url).href;
-	const redditIcon = new URL("./img/reddit-icon.svg", import.meta.url).href;
-	const twitterIcon = new URL("./img/twitter-icon.svg", import.meta.url).href;
+	const logoIcon = new URL("../img/logo.svg", import.meta.url).href;
+	const discordIcon = new URL("../img/discord-icon.svg", import.meta.url).href;
+	const redditIcon = new URL("../img/reddit-icon.svg", import.meta.url).href;
+	const twitterIcon = new URL("../img/twitter-icon.svg", import.meta.url).href;
 
 	return (
 		<main className="min-h-screen pt-10 px-24 space-y-10">
@@ -45,11 +47,13 @@ export function Home() {
 						Sul.
 					</p>
 				</div>
-				<Button className="text-sm w-36 h-12 rounded-xl bg-gradient-to-r from-[#FF3BFF] via-[#ECBFBF] to-[#5C24FF] p-1 hover:opacity-70">
-					<span className="h-full w-full bg-background flex justify-center items-center rounded-xl px-[71px] py-[23px]">
-						Get Started
-					</span>
-				</Button>
+				<Link to="/ai/openai">
+					<Button className="text-sm w-36 h-12 rounded-xl bg-gradient-to-r from-[#FF3BFF] via-[#ECBFBF] to-[#5C24FF] p-1 hover:opacity-70">
+						<span className="h-full w-full bg-background flex justify-center items-center rounded-xl px-[71px] py-[23px]">
+							Get Started
+						</span>
+					</Button>
+				</Link>
 			</div>
 		</main>
 	);
